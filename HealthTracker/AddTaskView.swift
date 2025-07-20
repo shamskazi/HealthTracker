@@ -1,13 +1,16 @@
 import SwiftUI
 
 struct AddTaskView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    @Environment(\.presentationMode) var presentationMode
+import SwiftUI
+import Firebase
 
+struct AddTaskView: View {
+    @Environment(\.presentationMode) var presentationMode
     @State private var taskName = ""
     @State private var scheduleTime: Double = 0
     var sleepEndDate: Date?
     var notificationManager: NotificationManager
+    var taskStore: TaskStore
 
     var body: some View {
         NavigationView {
@@ -33,23 +36,16 @@ struct AddTaskView: View {
     }
 
     private func addTask() {
-        withAnimation {
-            let newTask = Task(context: viewContext)
-            newTask.name = taskName
-            newTask.completed = false
-
-            if let sleepEndDate = sleepEndDate {
-                newTask.scheduledDate = sleepEndDate.addingTimeInterval(scheduleTime * 60)
-            }
-
-            do {
-                try viewContext.save()
-                notificationManager.scheduleNotification(for: newTask)
-                presentationMode.wrappedValue.dismiss()
-            } catch {
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+        var newTask = Task(name: taskName)
+        if let sleepEndDate = sleepEndDate {
+            newTask.scheduledDate = sleepEndDate.addingTimeInterval(scheduleTime * 60)
         }
+        if let userId = Auth.auth().currentUser?.uid {
+            newTask.userId = userId
+        }
+
+        taskStore.addTask(newTask)
+        notificationManager.scheduleNotification(for: newTask)
+        presentationMode.wrappedValue.dismiss()
     }
 }

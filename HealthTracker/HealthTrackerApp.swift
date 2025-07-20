@@ -1,13 +1,18 @@
 import SwiftUI
+import Firebase
 
 @main
 struct HealthTrackerApp: App {
-    let persistenceController = PersistenceController.shared
+    init() {
+        FirebaseApp.configure()
+    }
+
+    @StateObject var session = SessionStore()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environmentObject(session)
         }
     }
 }

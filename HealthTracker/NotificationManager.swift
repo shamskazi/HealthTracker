@@ -18,7 +18,13 @@ class NotificationManager {
         let triggerDate = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: scheduledDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: triggerDate, repeats: false)
 
-        let request = UNNotificationRequest(identifier: task.objectID.uriRepresentation().absoluteString, content: content, trigger: trigger)
+        guard let taskId = task.id else { return }
+        let request = UNNotificationRequest(identifier: taskId, content: content, trigger: trigger)
         UNUserNotificationCenter.current().add(request)
+    }
+
+    func cancelNotification(for task: Task) {
+        guard let taskId = task.id else { return }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [taskId])
     }
 }
