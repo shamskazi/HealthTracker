@@ -60,18 +60,21 @@ struct MainView: View {
     private func setup() {
         if let userId = Auth.auth().currentUser?.uid {
             taskStore.fetchTasks(userId: userId)
-        }
-        healthKitManager.requestAuthorization { success in
-            if success {
-                healthKitManager.fetchSleepData { startDate, endDate in
-                    self.sleepStartDate = startDate
-                    self.sleepEndDate = endDate
+            healthKitManager.requestAuthorization { success in
+                if success {
+                    healthKitManager.fetchSleepData { startDate, endDate in
+                        self.sleepStartDate = startDate
+                        self.sleepEndDate = endDate
+                        if let startDate = startDate, let endDate = endDate {
+                            healthKitManager.saveSleepDataToFirestore(startDate: startDate, endDate: endDate, userId: userId)
+                        }
+                    }
                 }
             }
-        }
-        notificationManager.requestAuthorization { success in
-            if !success {
-                print("Notification authorization denied.")
+            notificationManager.requestAuthorization { success in
+                if !success {
+                    print("Notification authorization denied.")
+                }
             }
         }
     }

@@ -1,7 +1,4 @@
 import SwiftUI
-
-struct AddTaskView: View {
-import SwiftUI
 import Firebase
 
 struct AddTaskView: View {

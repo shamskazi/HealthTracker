@@ -1,4 +1,5 @@
 import HealthKit
+import Firebase
 
 class HealthKitManager {
     let healthStore = HKHealthStore()
@@ -37,5 +38,14 @@ class HealthKitManager {
             completion(startDate, endDate)
         }
         healthStore.execute(query)
+    }
+
+    func saveSleepDataToFirestore(startDate: Date, endDate: Date, userId: String) {
+        let db = Firestore.firestore()
+        db.collection("sleepData").addDocument(data: [
+            "startDate": startDate,
+            "endDate": endDate,
+            "userId": userId
+        ])
     }
 }
